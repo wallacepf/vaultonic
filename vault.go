@@ -13,17 +13,17 @@ import (
 )
 
 type VaultParams struct {
-	Address             string
-	ApproleRoleID       string
+	Address              string
+	ApproleRoleID        string
 	ApproleWrappedSecret string
 	KeyName              string
 }
 
 type AppRoleWriteCustomSecretIdResponse struct {
-	SecretId string `json:"secret_id,omitempty"`
+	SecretId         string `json:"secret_id,omitempty"`
 	SecretIdAccessor string `json:"secret_id_accessor,omitempty"`
-	SecretIdNumUses int32 `json:"secret_id_num_uses,omitempty"`
-	SecretIdTtl int32 `json:"secret_id_ttl,omitempty"`
+	SecretIdNumUses  int32  `json:"secret_id_num_uses,omitempty"`
+	SecretIdTtl      int32  `json:"secret_id_ttl,omitempty"`
 }
 
 type Vault struct {
@@ -57,7 +57,7 @@ type Vault struct {
 // 	return v, token, nil
 // }
 
-func VaultClient (params VaultParams) (*Vault, string, error) {
+func VaultClient(params VaultParams) (*Vault, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := vault.New(
@@ -69,7 +69,7 @@ func VaultClient (params VaultParams) (*Vault, string, error) {
 	}
 
 	v := &Vault{
-		client: client,
+		client:     client,
 		parameters: params,
 	}
 
@@ -122,7 +122,7 @@ func (v *Vault) login(ctx context.Context, secret_id string) (string, error) {
 	resp, err := v.client.Auth.AppRoleLogin(
 		ctx,
 		schema.AppRoleLoginRequest{
-			RoleId: v.parameters.ApproleRoleID,
+			RoleId:   v.parameters.ApproleRoleID,
 			SecretId: secret_id,
 		},
 	)
@@ -130,7 +130,7 @@ func (v *Vault) login(ctx context.Context, secret_id string) (string, error) {
 		return "", fmt.Errorf("login Error: %s", err)
 	}
 	fmt.Printf("logged Into Vault: %s\n", resp.Auth.ClientToken)
-	return resp.Auth.ClientToken, nil 
+	return resp.Auth.ClientToken, nil
 }
 
 func (v *Vault) Encrypt(ctx context.Context, data []byte) (map[string]interface{}, error) {
@@ -139,7 +139,9 @@ func (v *Vault) Encrypt(ctx context.Context, data []byte) (map[string]interface{
 		"plaintext": base64.StdEncoding.EncodeToString(data),
 	}
 
-	cipher, err := v.client.Write(ctx, v.parameters.TransitEncrypt, pt)
+	tep := "transit/encrypt/" + v.parameters.KeyName
+
+	cipher, err := v.client.Write(ctx, tep, pt)
 	// cipher, err := v.client.Logical().WriteWithContext(ctx, v.parameters.TransitEncrypt, pt)
 	if err != nil {
 		return nil, fmt.Errorf("error encrypting data: %w", err)
