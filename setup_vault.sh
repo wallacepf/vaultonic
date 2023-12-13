@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Download Vault
-wget https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip -O vault.zip
+wget -nv https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip -O vault.zip
 sudo unzip -o vault.zip -d /usr/bin
 rm vault.zip
 
@@ -12,8 +12,8 @@ sleep 5
 
 # Set Vault address and token
 
-VAULT_ADDR='http://127.0.0.1:8200'
-VAULT_TOKEN="root"
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN="root"
 
 # Vault Configs
 vault auth enable approle
@@ -29,5 +29,8 @@ EOF
 
 # Get AppRole ID and Secret ID
 
-APPROLE_ROLE_ID=$(vault read auth/approle/role/my-role/role-id | grep role_id | awk '{print $2}')
-APPROLE_W_SECRET=$(vault write -wrap-ttl=120s -f -format=json auth/approle/role/my-role/secret-id | jq -r '.wrap_info.token')
+export APPROLE_ROLE_ID=$(vault read auth/approle/role/my-role/role-id | grep role_id | awk '{print $2}')
+export APPROLE_W_SECRET=$(vault write -wrap-ttl=120s -f -format=json auth/approle/role/my-role/secret-id | jq -r '.wrap_info.token')
+
+echo "APPROLE_ROLE_ID=$APPROLE_ROLE_ID" >> $GITHUB_ENV
+echo "APPROLE_W_SECRET=$APPROLE_W_SECRET" >> $GITHUB_ENV
