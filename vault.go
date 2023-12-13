@@ -16,8 +16,7 @@ type VaultParams struct {
 	Address             string
 	ApproleRoleID       string
 	ApproleWrappedSecret string
-	TransitEncrypt      string
-	TransitDecrypt      string
+	KeyName              string
 }
 
 type AppRoleWriteCustomSecretIdResponse struct {
