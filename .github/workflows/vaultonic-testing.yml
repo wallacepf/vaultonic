@@ -1,0 +1,25 @@
+name: Vaultonic Testing
+
+on: 
+    pull_request:
+        branches:
+            - master
+    push:
+        branches:
+            - master
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: "Set up Go"
+              uses: actions/setup-go@v4
+              with:
+                go-version-file: 'go.mod'
+            - name: "Setup Environment"
+              run: |
+                go mod download
+                . setup_vault.sh
+            - name: "Run tests"
+              run: go test
