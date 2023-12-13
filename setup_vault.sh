@@ -6,7 +6,7 @@ sudo unzip -o vault.zip -d /usr/bin
 rm vault.zip
 
 # Run Vault
-kill $(lsof -t -i:8200)
+# kill $(lsof -t -i:8200)
 vault server -dev -dev-root-token-id="root" &
 sleep 5
 
